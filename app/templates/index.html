@@ -1,0 +1,11 @@
+<!-- django uses the extends argument to take the base.html, therefore on this page only the content is written-->
+{% extends "base.html" %}
+
+<!-- the block statement + name tells the programm that it need to combine here index and base-->
+{% block content %}
+    <h1>Hi, {{ user.username }}!</h1>
+    {% for post in posts %}
+    <div><p>{{ post.author.username }} says: <b>{{ post.body }}</b></p></div>
+    {% endfor %}
+    <div>Above you can see the first comments of this blog!</div>
+{% endblock %}
