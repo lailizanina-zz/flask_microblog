@@ -1,5 +1,7 @@
 from datetime import datetime
 from app import db
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -10,6 +12,14 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
+
+#Using the werkzeug to create a password security transforming passwort on a long string. At first the password is thfined and on the next def it is verified.
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
