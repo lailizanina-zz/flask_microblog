@@ -2,6 +2,8 @@
 from app import app
 from flask import render_template, flash, redirect
 from app.forms import LoginForm
+from flask_login import current_user, login_user
+from app.models import User
 
 #this function is a call back to the event in which the function is associated to the URL / and /index.
 @app.route('/')
@@ -28,18 +30,16 @@ def index():
 # The method allows the app to acept POST requests, that will return form data to the server
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
     form = LoginForm()
-#precesses the data.
 #If app sends GET it returns False. In the case,the function skips the if statment and render the last line template
 #If app sends POST, returns True. Validating the process and allowing the sign in.
     if form.validate_on_submit():
-#Flash interracts with the user(messages). Allows the user to notice if the action was sucessful.
-        flash('Login requested for user {}, remember_me{}'.format(
-            form.username.data, form.remember_me.data))
-#The user acess the page inside the own URL. The function instructs the client web browser to automatically navigate to a different page.
-        return redirect(url_for('/index'))
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is None or not user.check_password(form.password.data):
+            flash('Invalid username or password')
+            return redirect(url_for('login'))
+        login_user(user, remember=form.remember_me.data)
+        return redirect(url_for('index'))
     return render_template('login.html', title='Sign In', form=form)
-#return a template filename and a variable list of template arguments and returns the same template.
-
-#Fask intercept the URL, activate the function and return "Hello, world!" to the browser.
-

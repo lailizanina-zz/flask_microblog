@@ -3,7 +3,7 @@ from flask import Flask
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask import LoginManager
+from flask_login import LoginManager
 #upercase-class and lowercase-package/module
 import logging
 logger = logging.getLogger('flask_migrate')
@@ -16,6 +16,7 @@ app.config.from_object(Config)
 # objects that will represent the imported packedges
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
 login = LoginManager(app)
 
 #the app variable is in the instance of class Flask __init__, inside the app packedge. 
