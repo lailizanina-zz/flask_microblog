@@ -1,13 +1,15 @@
 #importing from the packdege app the variable app(in __init__).
 from app import app
-from flask import render_template, flash, redirect
+from flask import render_template, flash, redirect, request
 from app.forms import LoginForm
-from flask_login import current_user, login_user
+from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
+from werkzeug.urls import url_parse
 
 #this function is a call back to the event in which the function is associated to the URL / and /index.
 @app.route('/')
 @app.route('/index')
+@login_required
 def index():
 #the dictionary mock object is created
     user = {'username': 'Victoria'}
@@ -40,5 +42,14 @@ def login():
             flash('Invalid username or password')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
+        next_page = request.args.get('next')
+        if not next_page or url_parse(next_page).netloc != '':
+            next_page = url_for('index')
+        return redirect(next_page)
         return redirect(url_for('index'))
     return render_template('login.html', title='Sign In', form=form)
+
+    @app.route('/logout')
+    def logout():
+        logout_user()
+        return redirect(url_for('index'))

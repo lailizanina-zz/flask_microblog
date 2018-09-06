@@ -18,6 +18,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 login = LoginManager(app)
+login.login_view = 'login'
 
 #the app variable is in the instance of class Flask __init__, inside the app packedge. 
 from app import routes, models
