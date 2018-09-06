@@ -28,13 +28,12 @@ def index():
     return render_template('index.html', title='Home', user=user, posts=posts)
 #function to login, from the /login URL that creates the form and render it.
 # The method allows the app to acept POST requests, that will return form data to the server
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = LoginForm()
-#If app sends GET it returns False. In the case,the function skips the if statment and render the last line template
-#If app sends POST, returns True. Validating the process and allowing the sign in.
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
