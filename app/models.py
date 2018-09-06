@@ -1,11 +1,8 @@
 from datetime import datetime
 from app import db, login
-from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 
-@login.user_loader
-def load_user(id):
-    return User.query.get(int(id))
     
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -16,7 +13,6 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
-
 #Using the werkzeug to create a password security transforming passwort on a long string. At first the password is thfined and on the next def it is verified.
 
     def set_password(self, password):
@@ -24,6 +20,10 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)

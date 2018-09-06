@@ -1,6 +1,6 @@
 #importing from the packdege app the variable app(in __init__).
 from app import app
-from flask import render_template, flash, redirect, request
+from flask import Flask, url_for, render_template, flash, redirect, request
 from app.forms import LoginForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
@@ -12,7 +12,6 @@ from werkzeug.urls import url_parse
 @login_required
 def index():
 #the dictionary mock object is created
-    user = {'username': 'Victoria'}
     posts = [
         {
             'author': {'username': 'John'},
@@ -27,7 +26,7 @@ def index():
             'body': 'The best way to predict the future is to invent it!'
         }
     ]
-    return render_template('index.html', title='Home', user=user, posts=posts)
+    return render_template('index.html', title='Home Page', posts=posts)
 #function to login, from the /login URL that creates the form and render it.
 # The method allows the app to acept POST requests, that will return form data to the server
 
