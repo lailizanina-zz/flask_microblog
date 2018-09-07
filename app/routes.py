@@ -1,10 +1,13 @@
-#importing from the packdege app the variable app(in __init__).
+from flask import render_template, flash, redirect, url_for, request
 from app import app
-from flask import Flask, url_for, render_template, flash, redirect, request
+#importing from the packdege app the variable app(in __init__).
 from app.forms import LoginForm
-from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User
+from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
+from app import app, db
+from app.forms import LoginForm, RegistrationForm
+from app.models import User
+
 
 #this function is a call back to the event in which the function is associated to the URL / and /index.
 @app.route('/')
@@ -26,7 +29,7 @@ def index():
             'body': 'The best way to predict the future is to invent it!'
         }
     ]
-    return render_template('index.html', title='Home Page', posts=posts)
+    return render_template('index.html', title='Home', posts=posts)
 #function to login, from the /login URL that creates the form and render it.
 # The method allows the app to acept POST requests, that will return form data to the server
 
@@ -45,7 +48,6 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
         return redirect(next_page)
-        return redirect(url_for('index'))
     return render_template('login.html', title='Sign In', form=form)
 
     @app.route('/logout')
