@@ -7,14 +7,20 @@ from werkzeug.urls import url_parse
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
 from app.models import User
+from datetime import datetime
 
+#this function is executed before all others
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
 
 #this function is a call back to the event in which the function is associated to the URL / and /index.
 @app.route('/')
 @app.route('/index')
 @login_required
 def index():
-#the dictionary mock object is created
     posts = [
         {
             'author': {'username': 'John'},
