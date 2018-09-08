@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+from wtforms import StringField, TextAreaField, SubmitField, PasswordField, BooleanField, SubmitField
+from wtforms.validators import ValidationError, DataRequired, Length, Email, EqualTo
 from app.models import User
 
 #inside class,the filds are variables that receive class objects imported from FlaskForm. The first argument is the indentification for the variable followed by the opicional arguments. 
@@ -28,3 +28,8 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
+            
+class EditProfileForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    about_me = TextAreaField('About me', validators=[Length(min=0, max=140)])
+    submit = SubmitField('Submit')
