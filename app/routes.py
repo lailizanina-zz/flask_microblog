@@ -1,11 +1,11 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app
+#importing from the packdege app the variable app(in __init__).
 from app.forms import LoginForm
-from flask_login import login_required, login_user, logout_user, current_user
+from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import RegistrationForm
-from app.forms import LoginForm
+from app.forms import LoginForm, RegistrationForm
 from app.models import User
 
 
@@ -50,10 +50,10 @@ def login():
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
-    @app.route('/logout')
-    def logout():
-        logout_user()
-        return redirect(url_for('index'))
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -68,3 +68,13 @@ def register():
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+@app.route('/user/<username>')
+@login_required
+def user(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    posts = [
+        {'author': user, 'body': 'Test post #1'},
+        {'author': user, 'body': 'Test post #2'}
+    ]
+    return render_template('user.html', user=user, posts=posts)
