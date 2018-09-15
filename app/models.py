@@ -4,7 +4,14 @@ from app import db, login
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
-    
+#This is a association table inside class
+followers = db.Table(
+    'followers',
+    db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
+)  
+
+
 class User(UserMixin, db.Model):
 #This is the user table
     id = db.Column(db.Integer, primary_key=True)
@@ -14,16 +21,19 @@ class User(UserMixin, db.Model):
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
-#This is a association table
-    followers = db.Table('followers',
-    db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
-)
+
+# many to many relationship
+    followed = db.relationship(
+        'User', secondary=followers,
+        primaryjoin=(followers.c.follower_id == id),
+        secondaryjoin=(followers.c.followed_id == id),
+        backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)
-#Using the werkzeug to create a password security transforming passwort on a long string. At first the password is thfined and on the next def it is verified.
 
+        return '<User {}>'.format(self.username)
+
+#Using the werkzeug to create a password security transforming passwort on a long string. At first the password is thfined and on the next def it is verified.
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
@@ -34,7 +44,7 @@ class User(UserMixin, db.Model):
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(
             digest, size)
 
-#Here the follows method is attetched
+    #Here the follows method is attetched
     def follow(self, user):
         if not self.is_following(user):
             self.followed.append(user)
@@ -49,10 +59,12 @@ class User(UserMixin, db.Model):
 
 #Defininf a query function to display the posts from followed users to the loggined user, that will define the info. it needs and extract if from other db.
     def followed_posts(self):
-        return Post.query.join(
+        followed = Post.query.join(
             followers, (followers.c.followed_id == Post.user_id)).filter(
-                followers.c.follower_id == self.id).order_by(
-                    Post.timestamp.desc())
+                followers.c.follower_id == self.id)
+        own = Post.query.filter_by(user_id=self.id)
+        return followed.union(own).order_by(Post.timestamp.desc())
+
 
 @login.user_loader
 def load_user(id):
