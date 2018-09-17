@@ -10,3 +10,10 @@ class Config(object):
 #disable the ALCHEMY configuration to sign the aplication every time a change is about to be made in the database.
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 #two expressions(a value sourced from an environment variable and a hardcored string, used in case the variable isn't disponible) joined by the or operator
+    MAIL_SERVER = os.environ.get('MAIL_SERVER')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25)
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    ADMINS = ['victoria.nascimento.meneghel@gmail.com']
+#setting the programm to notify me through gmail about any bug in the aplication

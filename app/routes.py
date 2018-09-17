@@ -119,6 +119,7 @@ def follow(username):
 @app.route('/unfollow/<username>')
 @login_required
 def unfollow(username):
+    form = EditProfileForm(current_user.username)
     user = User.query.filter_by(username=username).first()
     if user is None:
         flash('User {} not found.'.format(username))
