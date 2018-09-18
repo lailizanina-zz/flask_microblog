@@ -5,8 +5,8 @@ from app.forms import LoginForm
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import EditProfileForm, LoginForm, RegistrationForm
-from app.models import User
+from app.forms import PostForm, EditProfileForm, LoginForm, RegistrationForm
+from app.models import Post, User
 from datetime import datetime
 
 #this function is executed before all others
@@ -21,6 +21,13 @@ def before_request():
 @app.route('/index')
 @login_required
 def index():
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(body=form.post.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
+        flash('Your post is now live!')
+        return redirect(url_for('index'))
     posts = [
         {
             'author': {'username': 'John'},
@@ -35,7 +42,7 @@ def index():
             'body': 'The best way to predict the future is to invent it!'
         }
     ]
-    return render_template('index.html', title='Home', posts=posts)
+    return render_template('index.html', title='Home', form=form, posts=posts)
 #function to login, from the /login URL that creates the form and render it.
 # The method allows the app to acept POST requests, that will return form data to the server
 
@@ -88,7 +95,7 @@ def user(username):
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
-    form = EditProfileForm()
+    form = EditProfileForm(current_user.username)
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.about_me = form.about_me.data
