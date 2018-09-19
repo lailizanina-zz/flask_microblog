@@ -17,8 +17,8 @@ def before_request():
         db.session.commit()
 
 #this function is a call back to the event in which the function is associated to the URL / and /index.
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
     form = PostForm()
@@ -28,21 +28,9 @@ def index():
         db.session.commit()
         flash('Your post is now live!')
         return redirect(url_for('index'))
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        },
-        {
-            'author': {'username': 'Max'},
-            'body': 'The best way to predict the future is to invent it!'
-        }
-    ]
-    return render_template('index.html', title='Home', form=form, posts=posts)
+    posts = current_user.followed_posts().all()
+    return render_template("index.html", title='Home Page', form=form,
+                           posts=posts)
 #function to login, from the /login URL that creates the form and render it.
 # The method allows the app to acept POST requests, that will return form data to the server
 
@@ -138,3 +126,9 @@ def unfollow(username):
     db.session.commit()
     flash('You are not following {}.'.format(username))
     return redirect(url_for('user', username=username))
+
+@app.route('/explore')
+@login_required
+def explore():
+    posts = Post.query.order_by(Post.timestamp.desc()).all()
+    return render_template('index.html', title='Explore', posts=posts)
