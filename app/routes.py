@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request
 from app import app
 #importing from the packdege app the variable app(in __init__).
@@ -7,7 +8,7 @@ from werkzeug.urls import url_parse
 from app import app, db
 from app.forms import PostForm, EditProfileForm, LoginForm, RegistrationForm
 from app.models import Post, User
-from datetime import datetime
+
 
 #this function is executed before all others
 @app.before_request
@@ -39,8 +40,21 @@ def index():
                            posts=posts.items, next_url=next_url, 
                            prev_url=prev_url)
 #function to login, from the /login URL that creates the form and render it.
-# The method allows the app to acept POST requests, that will return form data to the server
 
+@app.route('/explore')
+@login_required
+def explore():
+    page = request.args.get('page', 1, type=int)
+    posts = Post.query.order_by(Post.timestamp.desc()).paginate(
+        page, app.config['POSTS_PER_PAGE'], False)
+    next_url = url_for('explore', page=posts.next_num) \
+        if posts.has_next else None
+    prev_url = url_for('explore', page=posts.prev_num) \
+        if posts.has_prev else None
+    return render_template('index.html', title='Explore', posts=posts.items, 
+                            next_url=next_url, prev_url=prev_url)
+
+# The method allows the app to acept POST requests, that will return form data to the server
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -88,7 +102,8 @@ def user(username):
         if posts.has_next else None
     prev_url = url_for('user', username=user.username, page=posts.prev_num) \
         if posts.has_prev else None
-    return render_template('user.html', user=user, posts=posts, next_url=next_url, prev_url=prev_url)
+    return render_template('user.html', user=user, posts=posts.items,
+                           next_url=next_url, prev_url=prev_url)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -136,15 +151,3 @@ def unfollow(username):
     db.session.commit()
     flash('You are not following {}.'.format(username))
     return redirect(url_for('user', username=username))
-
-@app.route('/explore')
-@login_required
-def explore():
-    page = request.args.get('page', 1, type=int)
-    posts = Post.query.order_by(Post.timestamp.desc()).paginate(
-        page, app.config['POSTS_PER_PAGE'], False)
-    next_url = url_for('explore', page=posts.next_num) \
-        if posts.has_next else None
-    prev_url = url_for('explore', page=posts.prev_num) \
-        if posts.has_prev else None
-    return render_template('index.html', title='Explore', posts=posts.items, next_url=next_url, prev_url=prev_url)
