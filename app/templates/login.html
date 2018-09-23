@@ -1,37 +1,17 @@
-<!--Thakes the basic templte-->
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
 
-<!--A form object expected as a argument sended by a login view function-->
-{% block content %}
+{% block app_content %}
     <h1>Sign In</h1>
-<!--Action atribute indicates that URL should be used to submite info.to the user, empty string indicates to use the current URL-->
-<!--Method atribute - HTTP requested method to submite the form to the server-->
-<!--Novalidate atribute - to don apply validation to the fields(letting to flask), allows you to test server-side validation-->
-    <form action="" method="post" novalidate>
-<!-- generates a hidden field that includes a token that is used to protect the form against CSRF attacks-->
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}<br>
-            {% for error in form.username.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}<br>
-            {% for error in form.password.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-        <p>{{ form.submit() }}</p>
-        <p>New User? 
-            <a href="{{ url_for('register') }}">Click to Register!</a>
-        </p>
-        <p>
-            Forgot Your Password?
-            <a href="{{ url_for('reset_password_request') }}">Click to Reset It</a>
-        </p>
-    </form>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+    <br>
+    <p>New User? <a href="{{ url_for('register') }}">Click to Register!</a></p>
+    <p>
+        Forgot Your Password?
+        <a href="{{ url_for('reset_password_request') }}">Click to Reset It</a>
+    </p>
 {% endblock %}
