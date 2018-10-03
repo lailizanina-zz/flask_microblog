@@ -17,4 +17,5 @@ class Config(object):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['victoria.nascimento.meneghel@gmail.com']
     POSTS_PER_PAGE = 5
+    LANGUAGES = ['en', 'es']
 #setting the programm to notify me through gmail about any bug in the aplication
