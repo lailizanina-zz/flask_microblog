@@ -1,5 +1,5 @@
 ##importing from the packdege app the variable app(in __init__) and app function(route).
-from app import app, db
+from app import app, db, cli
 from app.models import User, Post
 
 @app.shell_context_processor
